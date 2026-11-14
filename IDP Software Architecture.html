@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Software Architecture – IoT Health Monitoring System</title>
+<style>
+:root{--bg:#f3f5f9;--card:#fff;--tx:#18202b;--mu:#5b6676;--line:#dde3ec;--c1:#0e7490;--c1b:#e0f4f8;--c2:#4f46e5;--c2b:#eceafd;--c3:#b45309;--c3b:#fdf0dc;--c4:#be4b0a;--c4b:#fde9dc;--c5:#15803d;--c5b:#e2f5e9;--c6:#b42318;--c6b:#fde6e4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f141b;--card:#18202a;--tx:#e8edf3;--mu:#9aa6b5;--line:#2b3542;--c1:#5fd0e8;--c1b:#12313a;--c2:#a5a0ff;--c2b:#25224f;--c3:#f2b45e;--c3b:#3a2c12;--c4:#ff9a62;--c4b:#42240f;--c5:#5fd68a;--c5b:#143222;--c6:#ff8a80;--c6b:#44201d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f141b;--card:#18202a;--tx:#e8edf3;--mu:#9aa6b5;--line:#2b3542;--c1:#5fd0e8;--c1b:#12313a;--c2:#a5a0ff;--c2b:#25224f;--c3:#f2b45e;--c3b:#3a2c12;--c4:#ff9a62;--c4b:#42240f;--c5:#5fd68a;--c5b:#143222;--c6:#ff8a80;--c6b:#44201d;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:22px 14px 44px}
+h1{font-size:22px;margin:0}
+.sub{color:var(--mu);margin:4px 0 20px;font-size:14px}
+.layer{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:14px;padding:12px 14px}
+.head{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.num{width:26px;height:26px;border-radius:50%;background:var(--c);color:var(--card);font-weight:800;font-size:13px;display:grid;place-items:center;flex:none}
+.title{font-weight:800;font-size:16px}
+.where{margin-left:auto;font-size:12px;color:var(--mu);border:1px solid var(--line);border-radius:99px;padding:1px 10px}
+.items{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.it{background:var(--cb);border-radius:10px;padding:8px 10px;font-size:13px}
+.it b{display:block;color:var(--c);font-size:13px}
+.it span{color:var(--mu);font-size:12px}
+.arrow{display:flex;flex-direction:column;align-items:center;color:var(--mu);font-size:12px;padding:4px 0;line-height:1.2}
+.arrow i{font-style:normal;font-size:18px}
+.l1{--c:var(--c1);--cb:var(--c1b)}.l2{--c:var(--c2);--cb:var(--c2b)}.l3{--c:var(--c3);--cb:var(--c3b)}.l4{--c:var(--c4);--cb:var(--c4b)}.l5{--c:var(--c5);--cb:var(--c5b)}.l6{--c:var(--c6);--cb:var(--c6b)}
+.side{margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:700px){.side{grid-template-columns:1fr}}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.box h2{font-size:15px;margin:0 0 8px}
+ol{margin:0;padding-left:20px;font-size:13px}
+ol li{margin-bottom:4px}
+pre{background:var(--bg);border-radius:8px;padding:10px;overflow-x:auto;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;margin:0}
+.note{font-size:12px;color:var(--mu);margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Software Architecture</h1>
+<p class="sub">IoT-Based Remote Health Monitoring and Emergency Alert System · six-layer design, ESP32 to caretaker</p>
+
+<div class="layer l1">
+<div class="head"><div class="num">1</div><div class="title">Sensing layer</div><div class="where">Wearable hardware</div></div>
+<div class="items">
+<div class="it"><b>MAX3010X</b><span>Pulse rate and SpO₂ (I²C)</span></div>
+<div class="it"><b>MLX90614</b><span>Body temperature (I²C)</span></div>
+<div class="it"><b>6DOF sensor</b><span>Movement and fall data (I²C)</span></div>
+<div class="it"><b>Ultrasonic sensor</b><span>SOS request by hand signal</span></div>
+</div></div>
+<div class="arrow"><i>↓</i>raw readings</div>
+
+<div class="layer l2">
+<div class="head"><div class="num">2</div><div class="title">Processing layer · ESP32 firmware</div><div class="where">C/C++ · Arduino IDE</div></div>
+<div class="items">
+<div class="it"><b>Sensor drivers</b><span>Read every sensor at set intervals</span></div>
+<div class="it"><b>Filter</b><span>Average recent samples to cut noise</span></div>
+<div class="it"><b>Threshold engine</b><span>Pulse, SpO₂, temperature ranges with a confirmation period</span></div>
+<div class="it"><b>Fall detector</b><span>Free-fall, impact (SVM), then inactivity</span></div>
+<div class="it"><b>SOS handler</b><span>Hand near the ultrasonic sensor creates an event</span></div>
+<div class="it"><b>Alert controller</b><span>Buzzer on, timestamp attached, event built</span></div>
+</div></div>
+<div class="arrow"><i>↓</i>JSON over Wi-Fi (HTTPS/TLS), auto-reconnect</div>
+
+<div class="layer l3">
+<div class="head"><div class="num">3</div><div class="title">Communication layer</div><div class="where">ESP32 Wi-Fi</div></div>
+<div class="items">
+<div class="it"><b>Live upload</b><span>Normal readings sent regularly</span></div>
+<div class="it"><b>Event upload</b><span>Confirmed events sent at once</span></div>
+</div></div>
+<div class="arrow"><i>↓</i>write</div>
+
+<div class="layer l4">
+<div class="head"><div class="num">4</div><div class="title">Cloud layer · Firebase</div><div class="where">Free plan</div></div>
+<div class="items">
+<div class="it"><b>Authentication</b><span>Only registered users log in</span></div>
+<div class="it"><b>Realtime Database</b><span>Live node, events list, history</span></div>
+<div class="it"><b>Security rules</b><span>Caretakers see only their patient</span></div>
+<div class="it"><b>Alert trigger</b><span>New event starts a caretaker notification</span></div>
+</div></div>
+<div class="arrow"><i>↓</i>real-time listeners</div>
+
+<div class="layer l5">
+<div class="head"><div class="num">5</div><div class="title">Application layer · Web dashboard</div><div class="where">HTML · CSS · JavaScript</div></div>
+<div class="items">
+<div class="it"><b>Login page</b><span>Doctor, family, caretaker</span></div>
+<div class="it"><b>Live vitals</b><span>Pulse, SpO₂, temperature, motion</span></div>
+<div class="it"><b>Charts and history</b><span>Trends over time</span></div>
+<div class="it"><b>Alert panel</b><span>Fall, SOS, abnormal reading</span></div>
+</div></div>
+<div class="arrow"><i>↓</i>notification</div>
+
+<div class="layer l6">
+<div class="head"><div class="num">6</div><div class="title">Alert layer</div><div class="where">Target: about 10 s</div></div>
+<div class="items">
+<div class="it"><b>Registered caretakers</b><span>Notified of every confirmed event</span></div>
+<div class="it"><b>Local buzzer</b><span>Sounds at the patient</span></div>
+</div></div>
+
+<div class="side">
+<div class="box"><h2>Data flow, step by step</h2>
+<ol>
+<li>Sensors give raw values to the ESP32.</li>
+<li>Firmware filters them and checks thresholds, fall and SOS logic.</li>
+<li>Normal data goes to the live node; a confirmed event also goes to the events list.</li>
+<li>Buzzer sounds locally on an event.</li>
+<li>Firebase pushes the change to the dashboard.</li>
+<li>Caretakers receive the alert.</li>
+</ol></div>
+<div class="box"><h2>Firebase data structure</h2>
+<pre>patients/
+  p1/
+    live/    pulse, spo2, temp, svm, ts
+    events/  type (FALL | SOS | ...), ts
+    history/ timestamped readings</pre></div>
+</div>
+<p class="note">Power: 18650 Li-ion cell charged through a TP4056 module. Prototype only, not a certified medical device.</p>
+</div>
+</body>
+</html>

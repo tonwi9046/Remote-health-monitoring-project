@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Health Monitor – Live Software Demo</title>
+<style>
+:root{--bg:#eef2f8;--card:#fff;--tx:#14202e;--mu:#5d6b7c;--line:#dde4ee;--ac:#2563eb;--ac2:#7c3aed;--ok:#0f9d58;--okb:#e0f5ea;--bad:#d92d20;--badb:#fde6e3;--wr:#b7791f;--ecg:#0f9d58;--chip:#f3f6fb;--shadow:0 6px 22px rgba(20,40,80,.08);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1219;--card:#161e29;--tx:#e8eef6;--mu:#9aa8ba;--line:#273241;--ac:#6ea0ff;--ac2:#b69cff;--ok:#4ade80;--okb:#12301f;--bad:#ff8077;--badb:#451d1a;--wr:#f2b45e;--ecg:#4ade80;--chip:#1d2733;--shadow:0 6px 22px rgba(0,0,0,.35);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1219;--card:#161e29;--tx:#e8eef6;--mu:#9aa8ba;--line:#273241;--ac:#6ea0ff;--ac2:#b69cff;--ok:#4ade80;--okb:#12301f;--bad:#ff8077;--badb:#451d1a;--wr:#f2b45e;--ecg:#4ade80;--chip:#1d2733;--shadow:0 6px 22px rgba(0,0,0,.35);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1020px;margin:0 auto;padding:16px 14px 44px}
+.hero{background:linear-gradient(120deg,#1d4ed8,#7c3aed);color:#fff;border-radius:18px;padding:18px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;box-shadow:var(--shadow)}
+.hero h1{margin:0;font-size:20px;line-height:1.25}
+.hero p{margin:2px 0 0;font-size:13px;opacity:.85}
+.live{margin-left:auto;background:rgba(255,255,255,.18);padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px}
+.dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pl 1.2s infinite}
+@keyframes pl{50%{opacity:.25}}
+.pipe{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:14px 0;font-size:12px;font-weight:600}
+.pipe .n{padding:6px 11px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--mu);transition:.25s}
+.pipe .n.on{background:var(--ac);border-color:var(--ac);color:#fff;transform:scale(1.06)}
+.pipe .ar{color:var(--mu)}
+.status{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-radius:14px;background:var(--okb);color:var(--ok);font-weight:800;border:1px solid var(--ok);margin-bottom:14px}
+.status.alert{background:var(--badb);color:var(--bad);border-color:var(--bad);animation:sh .5s 2}
+@keyframes sh{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.bz{font-size:13px}.bz.on{animation:pl .35s infinite}
+.vit{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.v{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow);transition:.25s}
+.v.bad{border-color:var(--bad);background:var(--badb)}
+.vt{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:13px;font-weight:600}
+.ic{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--chip);font-size:16px}
+.num{font-size:32px;font-weight:800;margin:6px 0 2px;letter-spacing:-.5px}
+.num small{font-size:13px;color:var(--mu);font-weight:600}
+.pill{display:inline-block;font-size:11px;font-weight:800;padding:2px 9px;border-radius:99px;background:var(--okb);color:var(--ok)}
+.v.bad .pill{background:var(--bad);color:var(--card)}
+.bar{height:6px;border-radius:9px;background:var(--chip);margin-top:10px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--ok);border-radius:9px;transition:width .6s,background .3s}
+.v.bad .bar i{background:var(--bad)}
+.two{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+.ct{font-size:12px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+svg.w{width:100%;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{padding:9px 14px;border-radius:99px;border:1px solid var(--line);background:var(--chip);color:var(--tx);font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+.chips button:hover{border-color:var(--ac);transform:translateY(-1px)}
+.chips button.act{background:var(--ac);border-color:var(--ac);color:#fff}
+.phone{width:100%;max-width:250px;margin:0 auto;border:6px solid var(--tx);border-radius:28px;padding:16px 10px 14px;background:var(--bg);min-height:230px}
+.phone .tm{text-align:center;font-weight:800;font-size:22px}
+.phone .dt{text-align:center;color:var(--mu);font-size:11px;margin-bottom:10px}
+.nt{background:var(--card);border-radius:14px;padding:9px 11px;font-size:12px;margin-bottom:7px;box-shadow:var(--shadow);animation:up .35s}
+.nt b{display:block;color:var(--bad);font-size:12px}
+.nt.empty{color:var(--mu);text-align:center}
+@keyframes up{from{opacity:0;transform:translateY(10px)}}
+.tl{max-height:200px;overflow-y:auto}
+.ev{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.ev:last-child{border:0}
+.tag{flex:none;height:fit-content;padding:1px 9px;border-radius:99px;background:var(--bad);color:var(--card);font-size:11px;font-weight:800}
+.mu{color:var(--mu);font-size:12px}
+pre{margin:0;background:var(--chip);border-radius:10px;padding:10px;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;overflow:auto;max-height:190px}
+.note{font-size:12px;color:var(--mu);margin-top:14px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+<div style="font-size:34px">🩺</div>
+<div><h1>IoT-Based Remote Health Monitoring and Emergency Alert System</h1><p>Software demo · simulated wearable → Firebase → dashboard</p></div>
+<div class="live"><span class="dot"></span>Connected to Firebase</div>
+</div>
+
+<div class="pipe" id="pipe">
+<span class="n">Sensors</span><span class="ar">›</span><span class="n">ESP32</span><span class="ar">›</span><span class="n">Wi-Fi</span><span class="ar">›</span><span class="n">Firebase</span><span class="ar">›</span><span class="n">Dashboard</span><span class="ar">›</span><span class="n">Caretaker</span>
+</div>
+
+<div id="status" class="status"><span id="stt">● Patient status: NORMAL</span><span id="bz" class="bz">🔈 Buzzer off</span></div>
+
+<div class="vit">
+<div class="v" id="v-pulse"><div class="vt"><span class="ic">❤️</span>Pulse rate</div><div class="num"><span class="x">--</span> <small>bpm</small></div><span class="pill">Normal</span><div class="bar"><i></i></div></div>
+<div class="v" id="v-spo2"><div class="vt"><span class="ic">🫁</span>Blood oxygen</div><div class="num"><span class="x">--</span> <small>% SpO₂</small></div><span class="pill">Normal</span><div class="bar"><i></i></div></div>
+<div class="v" id="v-temp"><div class="vt"><span class="ic">🌡️</span>Temperature</div><div class="num"><span class="x">--</span> <small>°C</small></div><span class="pill">Normal</span><div class="bar"><i></i></div></div>
+<div class="v" id="v-svm"><div class="vt"><span class="ic">🏃</span>Motion (SVM)</div><div class="num"><span class="x">--</span> <small>g</small></div><span class="pill">Resting</span><div class="bar"><i></i></div></div>
+<div class="v" id="v-dist"><div class="vt"><span class="ic">✋</span>SOS sensor</div><div class="num"><span class="x">--</span> <small>cm</small></div><span class="pill">Clear</span><div class="bar"><i></i></div></div>
+</div>
+
+<div class="card" style="margin-bottom:14px">
+<div class="ct">Try a scenario (what the wearable would sense)</div>
+<div class="chips" id="chips">
+<button class="act" onclick="setMode('normal',this)">✅ Normal</button>
+<button onclick="setMode('spo2',this)">🫁 Low SpO₂</button>
+<button onclick="setMode('fever',this)">🌡️ High temperature</button>
+<button onclick="setMode('fall',this)">⬇️ Fall</button>
+<button onclick="setMode('sos',this)">✋ SOS hand signal</button>
+</div>
+</div>
+
+<div class="two">
+<div class="card">
+<div class="ct">Live pulse waveform</div>
+<svg class="w" viewBox="0 0 400 90" preserveAspectRatio="none" style="height:90px"><g stroke="var(--line)" stroke-width="1"><line x1="0" y1="45" x2="400" y2="45"/><line x1="100" y1="0" x2="100" y2="90"/><line x1="200" y1="0" x2="200" y2="90"/><line x1="300" y1="0" x2="300" y2="90"/></g><polyline id="ecg" fill="none" stroke="var(--ecg)" stroke-width="2" stroke-linejoin="round" points=""/></svg>
+<div class="ct" style="margin-top:12px">Motion (last 30 s)</div>
+<svg class="w" viewBox="0 0 300 60" preserveAspectRatio="none" style="height:60px"><polyline id="mot" fill="none" stroke="var(--ac2)" stroke-width="2" points=""/></svg>
+</div>
+<div class="card">
+<div class="ct">Caretaker’s phone</div>
+<div class="phone"><div class="tm" id="clk">--:--</div><div class="dt">Emergency alerts</div><div id="notes"><div class="nt empty">No alerts</div></div></div>
+</div>
+</div>
+
+<div class="two" style="grid-template-columns:1fr 1fr">
+<div class="card"><div class="ct">Event history</div><div class="tl" id="tl"><div class="mu">No events yet.</div></div></div>
+<div class="card"><div class="ct">Latest data sent to Firebase</div><pre id="json"></pre></div>
+</div>
+
+<p class="note">All readings are simulated in the browser; the real ESP32 will write the same JSON to Firebase. Prototype only, not a certified medical device.</p>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const r=(a,b)=>a+Math.random()*(b-a);
+let mode="normal",step=0,sosTicks=0,buzzUntil=0,events=[],bpm=72;
+const cnt={spo2:0,pulse:0,temp:0},act={spo2:false,pulse:false,temp:false};
+let fs=0,inact=0,sosHold=0,sosAct=false;
+const mH=[];
+
+function setMode(m,btn){mode=m;step=0;sosTicks=0;document.querySelectorAll("#chips button").forEach(b=>b.className="");btn.className="act"}
+
+function sample(){
+  const d={pulse:r(70,76),spo2:r(96,98.5),temp:r(36.5,36.9),svm:r(.96,1.05),dist:r(110,130)};
+  if(mode==="spo2"){d.spo2=r(85,88.5);d.pulse=r(98,108)}
+  if(mode==="fever"){d.temp=r(38.4,38.9);d.pulse=r(100,110)}
+  if(mode==="fall"){const f=[.3,3.4,1,1,1,1];if(step<f.length)d.svm=f[step]+r(-.03,.03);step++;if(step>7)back()}
+  if(mode==="sos"){d.dist=r(4,8);sosTicks++;if(sosTicks>5)back()}
+  return d;
+}
+function back(){mode="normal";document.querySelectorAll("#chips button").forEach((b,i)=>b.className=i?"":"act")}
+
+function addEvent(type,detail){
+  const t=new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  events.unshift({type,detail,t});
+  buzzUntil=Date.now()+4000;
+  const n=document.createElement("div");n.className="nt";n.innerHTML="<b>🔔 "+type+"</b>"+detail+"<div class=\"mu\">"+t+"</div>";
+  const box=$("notes");if(box.firstChild&&box.firstChild.className.includes("empty"))box.innerHTML="";
+  box.prepend(n);while(box.children.length>3)box.lastChild.remove();
+  $("tl").innerHTML=events.map(e=>"<div class=\"ev\"><span class=\"tag\">"+e.type+"</span><div>"+e.detail+"<div class=\"mu\">"+e.t+"</div></div></div>").join("");
+}
+function check(k,bad,type,detail){
+  if(bad){cnt[k]++;if(cnt[k]>=3&&!act[k]){act[k]=true;addEvent(type,detail)}}else{cnt[k]=0;act[k]=false}
+}
+function logic(d){
+  check("spo2",d.spo2<90,"LOW SpO₂","SpO₂ stayed below 90% ("+d.spo2.toFixed(0)+"%).");
+  check("pulse",d.pulse<50||d.pulse>120,"ABNORMAL PULSE","Pulse outside 50–120 bpm ("+d.pulse.toFixed(0)+").");
+  check("temp",d.temp>38,"HIGH TEMP","Temperature above 38 °C ("+d.temp.toFixed(1)+").");
+  if(fs===0&&d.svm<.5)fs=1;
+  else if(fs>=1&&d.svm>2.5){fs=2;inact=0}
+  else if(fs===2){if(Math.abs(d.svm-1)<.15){inact++;if(inact>=3){addEvent("FALL","Impact followed by 3 s without movement.");fs=0}}else inact=0}
+  if(d.dist<10){sosHold++;if(sosHold>=2&&!sosAct){sosAct=true;addEvent("SOS","Help requested with the ultrasonic sensor.")}}else{sosHold=0;sosAct=false}
+}
+function show(k,txt,bad,val,lo,hi,okT,badT){
+  const c=$("v-"+k);c.className="v"+(bad?" bad":"");
+  c.querySelector(".x").textContent=txt;
+  c.querySelector(".pill").textContent=bad?badT:okT;
+  c.querySelector(".bar i").style.width=Math.max(4,Math.min(100,(val-lo)/(hi-lo)*100))+"%";
+}
+function flow(){
+  const ns=[...document.querySelectorAll("#pipe .n")];
+  ns.forEach((n,i)=>setTimeout(()=>{ns.forEach(x=>x.classList.remove("on"));n.classList.add("on")},i*130));
+  setTimeout(()=>ns.forEach(x=>x.classList.remove("on")),ns.length*130+150);
+}
+function tick(){
+  const d=sample();logic(d);bpm=d.pulse;
+  show("pulse",d.pulse.toFixed(0),d.pulse<50||d.pulse>120,d.pulse,40,140,"Normal","Out of range");
+  show("spo2",d.spo2.toFixed(0),d.spo2<90,d.spo2,80,100,"Normal","Low");
+  show("temp",d.temp.toFixed(1),d.temp>38,d.temp,35,40,"Normal","High");
+  show("svm",d.svm.toFixed(2),d.svm>2.5||d.svm<.5,d.svm,0,4,"Resting","Fall pattern");
+  show("dist",d.dist.toFixed(0),d.dist<10,Math.min(d.dist,150),0,150,"Clear","Hand detected");
+  mH.push(d.svm);if(mH.length>30)mH.shift();
+  $("mot").setAttribute("points",mH.map((v,i)=>(i*300/29).toFixed(1)+","+(56-Math.min(v,4)/4*52).toFixed(1)).join(" "));
+  $("json").textContent=JSON.stringify({pulse:+d.pulse.toFixed(0),spo2:+d.spo2.toFixed(0),temp:+d.temp.toFixed(1),svm:+d.svm.toFixed(2),dist:+d.dist.toFixed(0),ts:Math.floor(Date.now()/1000)},null,1);
+  const al=Date.now()<buzzUntil;
+  $("status").className="status"+(al?" alert":"");
+  $("stt").textContent=al?"⚠ EMERGENCY ALERT":"● Patient status: NORMAL";
+  $("bz").textContent=al?"🔊 Buzzer ON":"🔈 Buzzer off";$("bz").className="bz"+(al?" on":"");
+  $("clk").textContent=new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+  flow();
+}
+// scrolling ECG waveform driven by current pulse
+const E=[];let ph=0;
+const g=(p,m,s)=>Math.exp(-((p-m)*(p-m))/(2*s*s));
+function ecgStep(){
+  ph+=0.04*bpm/60;if(ph>=1)ph-=1;
+  const y=.12*g(ph,.15,.03)-.15*g(ph,.38,.008)+1*g(ph,.4,.01)-.25*g(ph,.43,.01)+.22*g(ph,.65,.05);
+  E.push(y);if(E.length>200)E.shift();
+  $("ecg").setAttribute("points",E.map((v,i)=>(i*2).toFixed(0)+","+(72-v*55+r(-.4,.4)).toFixed(1)).join(" "));
+}
+tick();setInterval(tick,1000);setInterval(ecgStep,40);
+</script>
+</body>
+</html>
